@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--light);
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--light);
+        }
+        
+        .api-base {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .api-base h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+        
+        .api-base input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .api-base input:focus {
+            outline: none;
+            border-color: var(--success);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-card {
+            background: rgba(44, 62, 80, 0.85);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+            background: rgba(44, 62, 80, 0.95);
+        }
+        
+        .feature-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: var(--light);
+            font-size: 1.4rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--gray);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-add {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-check {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-list {
+            background: var(--warning);
+            color: white;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .result-container {
+            background: rgba(44, 62, 80, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            min-height: 200px;
+        }
+        
+        .result-container h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--light);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .result-content {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .api-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .api-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+        }
+        
+        .api-item h4 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        .api-item p {
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+        
+        .success {
+            color: var(--success);
+        }
+        
+        .error {
+            color: var(--danger);
+        }
+        
+        .info {
+            color: var(--primary);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-key"></i> Manajemen API Key</h1>
+            <p>Kelola API Key untuk REST API Anda dengan mudah. Tambahkan, hapus, periksa, dan lihat daftar API Key.</p>
+        </header>
+        
+        <div class="api-base">
+            <h2><i class="fas fa-server"></i> REST API Base URL</h2>
+            <input type="text" id="apiUrl" value="https://restapi.rafatharcode.apibotwa.biz.id" readonly>
+            <p>API Utama: <span id="mainApiKey">alfixkiabdg</span> (tersimpan di backend)</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3><i class="fas fa-plus-circle"></i> Tambah API Key</h3>
+                <div class="form-group">
+                    <label for="newKey">API Key Baru</label>
+                    <input type="text" id="newKey" placeholder="Contoh: apikeybaru123">
+                </div>
+                <div class="form-group">
+                    <label for="expired">Masa Berlaku</label>
+                    <input type="text" id="expired" placeholder="Contoh: 1d, 7d, 30d">
+                </div>
+                <button class="btn-add" id="addBtn">
+                    <i class="fas fa-plus"></i> Tambahkan
+                </button>
+            </div>
+            
+            <div class="feature-card">
+                <h3><i class="fas fa-trash-alt"></i> Hapus API Key</h3>
+                <div class="form-group">
+                    <label for="keyToDelete">API Key yang akan dihapus</label>
+                    <input type="text" id="keyToDelete" placeholder="Masukkan API Key">
+                </div>
+                <button class="btn-delete" id="deleteBtn">
+                    <i class="fas fa-trash"></i> Hapus
+                </button>
+            </div>
+            
+            <div class="feature-card">
+                <h3><i class="fas fa-search"></i> Periksa API Key</h3>
+                <div class="form-group">
+                    <label for="keyToCheck">API Key yang akan diperiksa</label>
+                    <input type="text" id="keyToCheck" placeholder="Masukkan API Key">
+                </div>
+                <button class="btn-check" id="checkBtn">
+                    <i class="fas fa-check"></i> Periksa
+                </button>
+            </div>
+            
+            <div class="feature-card">
+                <h3><i class="fas fa-list"></i> Daftar API Key</h3>
+                <p>Tampilkan semua API Key yang terdaftar</p>
+                <button class="btn-list" id="listBtn">
+                    <i class="fas fa-sync"></i> Muat Daftar
+                </button>
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <h3><i class="fas fa-clipboard-list"></i> Hasil Operasi</h3>
+            <div class="result-content" id="result">
+                {/* Hasil akan ditampilkan di sini */}
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 REST API Manager - Dibuat dengan ❤️ untuk manajemen API Key</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Elemen DOM
+        const addBtn = document.getElementById('addBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const listBtn = document.getElementById('listBtn');
+        const resultDiv = document.getElementById('result');
+        const mainApiKey = document.getElementById('mainApiKey').textContent;
+        const apiUrl = document.getElementById('apiUrl').value;
+        
+        // Fungsi untuk menampilkan hasil
+        function showResult(content, className = '') {
+            resultDiv.innerHTML = `<div class="${className}">${content}</div>`;
+        }
+        
+        // Fungsi untuk menampilkan loading
+        function showLoading() {
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+        }
+        
+        // Fungsi untuk menangani error
+        function handleError(error) {
+            showResult(`❌ Error: ${error.message || 'Terjadi kesalahan'}`, 'error');
+        }
+        
+        // Event: Tambah API Key
+        addBtn.addEventListener('click', async () => {
+            const newKey = document.getElementById('newKey').value;
+            const expired = document.getElementById('expired').value;
+            
+            if (!newKey || !expired) {
+                showResult('⚠️ Masukkan format: API Key Baru | Masa Berlaku<br>Contoh: tester|1d', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/addapikey?apikey=${mainApiKey}&new_key=${newKey}&expired=${expired}`);
+                const data = await response.json();
+                
+                if (data.status) {
+                    const resultContent = `
+                        <div class="success">
+                            <p>✅ <strong>Berhasil Menambahkan API Key!</strong></p>
+                            <p>🌐 <strong>Link Rest-API:</strong> ${apiUrl}</p>
+                            <p>🔑 <strong>Key:</strong> ${newKey}</p>
+                            <p>⏳ <strong>Expired:</strong> ${expired}</p>
+                            <button onclick="copyToClipboard('${newKey}')" style="margin-top: 15px; background: var(--primary);">
+                                <i class="fas fa-copy"></i> Salin API Key
+                            </button>
+                        </div>
+                    `;
+                    showResult(resultContent, 'success');
+                } else {
+                    showResult(`❌ Gagal menambahkan API Key: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+        
+        // Event: Hapus API Key
+        deleteBtn.addEventListener('click', async () => {
+            const keyToDelete = document.getElementById('keyToDelete').value;
+            
+            if (!keyToDelete) {
+                showResult('⚠️ Masukkan API Key yang akan dihapus', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/deleteapikey?apikey=${mainApiKey}&apikeydel=${keyToDelete}`);
+                const data = await response.json();
+                
+                if (data.status) {
+                    const resultContent = `
+                        <div class="success">
+                            <p>✅ <strong>API Key berhasil dihapus!</strong></p>
+                            <p>🔑 <strong>Key:</strong> ${keyToDelete}</p>
+                        </div>
+                    `;
+                    showResult(resultContent, 'success');
+                } else {
+                    showResult(`❌ Gagal menghapus API Key: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+        
+        // Event: Periksa API Key
+        checkBtn.addEventListener('click', async () => {
+            const keyToCheck = document.getElementById('keyToCheck').value;
+            
+            if (!keyToCheck) {
+                showResult('⚠️ Masukkan API Key yang akan diperiksa', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/cekapikey?apikey=${keyToCheck}`);
+                const data = await response.json();
+                
+                if (data.status) {
+                    const resultContent = `
+                        <div class="success">
+                            <p>✅ <strong>API Key Ditemukan!</strong></p>
+                            <p>🧑‍💻 <strong>Creator:</strong> ${data.creator || 'N/A'}</p>
+                            <p>🔑 <strong>Key:</strong> ${data.apikey || 'N/A'}</p>
+                            <p>⏳ <strong>Expired:</strong> ${data.expired || 'N/A'}</p>
+                        </div>
+                    `;
+                    showResult(resultContent, 'success');
+                } else {
+                    showResult(`❌ Gagal menemukan API Key: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+        
+        // Event: List API Key
+        listBtn.addEventListener('click', async () => {
+            showLoading();
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/listapikey?apikey=${mainApiKey}`);
+                const data = await response.json();
+                
+                if (data.status) {
+                    if (data.data && data.data.length > 0) {
+                        let listContent = `
+                            <div class="success">
+                                <p>📊 <strong>Total API Key:</strong> ${data.data.length}</p>
+                                <div class="api-list">
+                        `;
+                        
+                        data.data.forEach((api, index) => {
+                            listContent += `
+                                <div class="api-item">
+                                    <h4><i class="fas fa-key"></i> API Key #${index + 1}</h4>
+                                    <p><strong>🔑 Key:</strong> ${api.key}</p>
+                                    <p><strong>⏳ Expired:</strong> ${api.expired}</p>
+                                </div>
+                            `;
+                        });
+                        
+                        listContent += '</div></div>';
+                        showResult(listContent, 'success');
+                    } else {
+                        showResult('ℹ️ Tidak ada API Key yang terdaftar', 'info');
+                    }
+                } else {
+                    showResult(`❌ Gagal mengambil daftar API Key: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                handleError(error);
+            }
+        });
+        
+        // Fungsi untuk menyalin teks ke clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    alert('API Key berhasil disalin!');
+                })
+                .catch(err => {
+                    console.error('Gagal menyalin: ', err);
+                });
+        }
+        
+        // Tampilkan pesan selamat datang
+        showResult('Selamat datang di Manajemen API Key.<br>Silakan gunakan menu di atas untuk mengelola API Key Anda.', 'info');
+    </script>
+</body>
+</html>
